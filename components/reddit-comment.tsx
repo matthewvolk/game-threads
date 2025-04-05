@@ -8,22 +8,23 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
-interface CommentProps {
-  comment: {
-    id: string;
-    author: string;
-    body: string;
-    created_utc: number;
-    score: number;
-    replies?: {
-      data: {
-        children: Array<{
-          kind: string;
-          data: any;
-        }>;
-      };
+export interface RedditComment {
+  id: string;
+  author: string;
+  body: string;
+  created_utc: number;
+  score: number;
+  replies?: {
+    data: {
+      children: Array<{
+        kind: string;
+        data: RedditComment;
+      }>;
     };
   };
+}
+interface CommentProps {
+  comment: RedditComment;
   depth?: number;
 }
 
@@ -38,12 +39,12 @@ export function RedditComment({ comment, depth = 0 }: CommentProps) {
     comment.replies.data.children.length > 0;
 
   const replies = hasReplies
-    ? comment.replies.data.children
+    ? comment.replies?.data.children
         .filter((child) => child.kind === "t1")
         .map((child) => child.data)
     : [];
 
-  const replyCount = replies.length;
+  const replyCount = replies?.length;
 
   // Get initials for avatar
   const getInitials = (name: string) => {
@@ -66,7 +67,7 @@ export function RedditComment({ comment, depth = 0 }: CommentProps) {
           <span className="font-medium">{comment.author}</span>
           <span className="mx-1">•</span>
           <span>{comment.score} points</span>
-          {replyCount > 0 && (
+          {replyCount && replyCount > 0 && (
             <>
               <span className="mx-1">•</span>
               <MessageSquare className="mr-1 h-3 w-3" />
@@ -121,7 +122,7 @@ export function RedditComment({ comment, depth = 0 }: CommentProps) {
               Collapse
             </Button>
 
-            {replyCount > 0 && (
+            {replyCount && replyCount > 0 && (
               <Button
                 className="h-7 px-2 text-xs"
                 onClick={() => setShowReplies(!showReplies)}
@@ -145,7 +146,7 @@ export function RedditComment({ comment, depth = 0 }: CommentProps) {
         </CardFooter>
       </Card>
 
-      {showReplies && replies.length > 0 && (
+      {showReplies && replies && replies.length > 0 && (
         <div className="mt-2 space-y-2">
           {replies.map((reply) => (
             <RedditComment comment={reply} depth={depth + 1} key={reply.id} />

@@ -31,7 +31,7 @@ export default function Home() {
         return pathParts[commentsIndex + 1];
       }
       return "";
-    } catch (e) {
+    } catch {
       return "";
     }
   };

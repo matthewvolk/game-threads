@@ -2,9 +2,10 @@
 
 import { formatDistanceToNow } from "date-fns";
 import { Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 import { RedditComment as RedditCommentComponent } from "@/components/reddit-comment";
+import { type RedditComment } from "@/components/reddit-comment";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -23,21 +24,6 @@ interface RedditThread {
   num_comments: number;
 }
 
-interface RedditComment {
-  id: string;
-  author: string;
-  body: string;
-  created_utc: number;
-  score: number;
-  replies?: {
-    data: {
-      children: Array<{
-        data: RedditComment;
-      }>;
-    };
-  };
-}
-
 export function RedditThreadViewer({
   threadId,
   autoRefresh,
@@ -48,7 +34,7 @@ export function RedditThreadViewer({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchThreadData = async () => {
+  const fetchThreadData = useCallback(async () => {
     if (!threadId) return;
 
     setLoading(true);
@@ -73,8 +59,8 @@ export function RedditThreadViewer({
       // Second item contains comments
       if (data[1]?.data?.children) {
         const fetchedComments = data[1].data.children
-          .filter((child: any) => child.kind === "t1")
-          .map((child: any) => child.data);
+          .filter((child: { kind: string }) => child.kind === "t1")
+          .map((child: { data: RedditComment }) => child.data);
 
         setComments(fetchedComments);
       }
@@ -85,7 +71,7 @@ export function RedditThreadViewer({
     } finally {
       setLoading(false);
     }
-  };
+  }, [threadId]);
 
   // Initial fetch
   useEffect(() => {
@@ -95,7 +81,7 @@ export function RedditThreadViewer({
       setThread(null);
       setComments([]);
     }
-  }, [threadId]);
+  }, [threadId, fetchThreadData]);
 
   // Set up auto-refresh
   useEffect(() => {
@@ -106,7 +92,7 @@ export function RedditThreadViewer({
     }, refreshInterval * 1000);
 
     return () => clearInterval(interval);
-  }, [autoRefresh, refreshInterval, threadId]);
+  }, [autoRefresh, refreshInterval, threadId, fetchThreadData]);
 
   if (!threadId) {
     return (
@@ -114,7 +100,8 @@ export function RedditThreadViewer({
         <div className="text-center">
           <h3 className="text-lg font-medium">No Thread Selected</h3>
           <p className="mt-2 text-muted-foreground">
-            Enter a Reddit thread URL above and click "Load" to view comments
+            Enter a Reddit thread URL above and click &quot;Load&quot; to view
+            comments
           </p>
         </div>
       </div>
