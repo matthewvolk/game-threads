@@ -14,7 +14,7 @@ export interface RedditComment {
   body: string;
   created_utc: number;
   score: number;
-  replies?: {
+  replies: {
     data: {
       children: Array<{
         kind: string;
@@ -44,7 +44,7 @@ export function RedditComment({ comment, depth = 0 }: CommentProps) {
         .map((child) => child.data)
     : [];
 
-  const replyCount = replies?.length;
+  const replyCount = replies.length;
 
   // Get initials for avatar
   const getInitials = (name: string) => {
@@ -67,7 +67,7 @@ export function RedditComment({ comment, depth = 0 }: CommentProps) {
           <span className="font-medium">{comment.author}</span>
           <span className="mx-1">•</span>
           <span>{comment.score} points</span>
-          {replyCount && replyCount > 0 && (
+          {replyCount > 0 && (
             <>
               <span className="mx-1">•</span>
               <MessageSquare className="mr-1 h-3 w-3" />
@@ -122,7 +122,7 @@ export function RedditComment({ comment, depth = 0 }: CommentProps) {
               Collapse
             </Button>
 
-            {replyCount && replyCount > 0 && (
+            {replyCount > 0 && (
               <Button
                 className="h-7 px-2 text-xs"
                 onClick={() => setShowReplies(!showReplies)}
@@ -146,7 +146,7 @@ export function RedditComment({ comment, depth = 0 }: CommentProps) {
         </CardFooter>
       </Card>
 
-      {showReplies && replies && replies.length > 0 && (
+      {showReplies && replies.length > 0 && (
         <div className="mt-2 space-y-2">
           {replies.map((reply) => (
             <RedditComment comment={reply} depth={depth + 1} key={reply.id} />
