@@ -48,13 +48,6 @@ export default function Home() {
 
   return (
     <main className="flex h-screen flex-col">
-      <header className="shrink-0 border-b p-4">
-        <h1 className="text-2xl font-bold">Reddit Game Thread Comparison</h1>
-        <p className="text-muted-foreground">
-          Compare comments from two different Reddit threads side by side
-        </p>
-      </header>
-
       <div className="flex min-h-0 flex-1 flex-col md:flex-row">
         {/* Left Panel */}
         <div className="flex min-h-0 w-full flex-col border-r md:w-1/2">

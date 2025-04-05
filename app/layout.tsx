@@ -4,7 +4,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Game Threads",
-  description: "Compare Reddit Game Threads",
+  description:
+    "A split-screen UI for viewing two live Reddit comment feeds at once",
 };
 
 export default function RootLayout({
